@@ -8,16 +8,25 @@ import {
   TouchableHighlight,
   TouchableOpacity ,
   Image,
-  FlatList
+  FlatList,
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
 var Dimensions = require('Dimensions');
 var {width, height} = Dimensions.get('window');
 import Icon from 'react-native-vector-icons/Ionicons';
+import SearchInput, { createFilter } from 'react-native-search-filter';
 import { List, ListItem, SearchBar,  } from "react-native-elements";
+const KEYS_TO_FILTERS = ['first_name', 'last_name'];
 export default class Home extends Component<{}> {
     state={
-        list:''
+        list:'',
+        searchTerm: '',
+        flag:false
     }
+    searchUpdated(term) {
+        this.setState({ searchTerm: term })
+      }
     componentDidMount() {
         this.makeRemoteRequest();
       }
@@ -29,6 +38,7 @@ export default class Home extends Component<{}> {
           .then(res => res.json())
           .then(res => {
             this.setState({
+                flag:true,
              list:res.data
             });
           })
@@ -38,10 +48,15 @@ export default class Home extends Component<{}> {
       };
 
     renderHeader = () => {
-        return <SearchBar placeholder="All People" lightTheme containerStyle={{backgroundColor:'white'}}  
+        return <SearchBar placeholder="All People" lightTheme containerStyle={{backgroundColor:'white'}} 
+        onChangeText={(term) => { this.searchUpdated(term) }}  
         inputStyle={{backgroundColor:'white', fontSize:20}} noIcon/>;
       };
     render(){
+        if(this.state.flag){
+            var x=this.state.list
+            const filteredList = x.filter(createFilter(this.state.searchTerm, KEYS_TO_FILTERS))
+            console.log("filteredList",filteredList)
         return(
             <View style={styles.container}>
             <View style={styles.header}>
@@ -53,25 +68,35 @@ export default class Home extends Component<{}> {
             </View>
            
             <View style={styles.main}>
-                <View style={{backgroundColor:'#F4A460', flex:1.75, padding:30}}>
-                <FlatList
-                    data={this.state.list}
-                    renderItem={({item}) => 
-                    <ListItem
-                        Avatar
-                        title={`${item.first_name} ${item.last_name}`}
-                        
-                        avatar={{ uri: item.avatar }}
-                        containerStyle={{ borderBottomWidth: 0, padding:20, backgroundColor:'lightgray' }}
-                        />}
-                    ListHeaderComponent={this.renderHeader}
-                    keyExtractor={item => item.id}
-                />
+                <View style={{backgroundColor:'#F4A460', flex:1.75, padding:30}}> 
+                        <FlatList
+                        data={filteredList}
+                        renderItem={({item}) => 
+                        <ListItem
+                            Avatar
+                            title={`${item.first_name} ${item.last_name}`}
+                            
+                            avatar={{ uri: item.avatar }}
+                            containerStyle={{ borderBottomWidth: 0, padding:20, backgroundColor:'lightgray' }}
+                            />}
+                        ListHeaderComponent={this.renderHeader}
+                        keyExtractor={item => item.id}
+                    />
+                    
+                                    
                 </View>
             </View>
-            </View>
+        </View>
 
         )
+    }
+    else{
+        return (
+            <View style={{flex: 1}}>
+                <ActivityIndicator size="large" color='#50e3a9' />
+            </View>
+        )
+    }
     }
 }
 const styles=StyleSheet.create({

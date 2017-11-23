@@ -12,6 +12,7 @@ import { StackNavigator } from 'react-navigation';
 import axios from 'axios'; 
 import Toast from 'react-native-simple-toast';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
+
 var Dimensions = require('Dimensions');
 var {width, height} = Dimensions.get('window');
 export default class Login extends Component<{}> {
@@ -23,15 +24,15 @@ export default class Login extends Component<{}> {
         this.props.navigation.navigate('Register')
     }
     home(){
-        axios.post('https://reqres.in/api/login?email='+this.state.email+'password='+this.state.password)
-        .then( (response)=> {
-             if(response.status=='200'){
+        // axios.post('https://reqres.in/api/login?email='+this.state.email+'password='+this.state.password)
+        // .then( (response)=> {
+        //      if(response.status=='200'){
                 this.props.navigation.navigate('Menu')
-            } 
-          })
-          .catch((error)=> {
-            Toast.showWithGravity("Sign in Failed! Wrong password or username",Toast.LONG,Toast.TOP)
-          });
+        //     } 
+        //   })
+        //   .catch((error)=> {
+        //     Toast.showWithGravity("Sign in Failed! Wrong password or username",Toast.LONG,Toast.TOP)
+        //   });
     }
     render() {
       return (
